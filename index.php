@@ -16,9 +16,14 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $name = curl_exec($ch);
+curl_close($ch);
+//get rid of quotation marks
+$name = str_replace('"', '', $name);
 $names = explode(" ", $name);
 $firstname = $names[0];
 $lastname = $names[1];
+
+
 /* using cURL again. normally since we are using this three times you would want
    a create a function, but I am just showing each step here. So I an not following
    good coding practices.
@@ -28,13 +33,16 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $email = curl_exec($ch);
+$email = str_replace('"', '', $email);
+curl_close($ch);
+
 
 // PUT lead in to IDX Broker
 $url = 'https://api.idxbroker.com/leads/lead';
 $data = array(
-	'firstName'=>$firstname ,
+	'firstName'=>$firstname,
 	'lastName'=>$lastname,
-	'email'=> $email
+	'email'=>$email
 );
 $data = http_build_query($data); // encode and & delineate
 $method = 'PUT';
@@ -66,12 +74,13 @@ $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 if ($code >= 200 || $code < 300){
 	$response = json_decode($response,true);
 //Show the succcessful addition
-  echo 'Lead '.$email.' was added to your IDX Broker account.<br><br>
-  <img src="assets/leads.gif">';
+echo $code.' Lead '.$email.' was added to your IDX Broker account.<br><br>
+<img src="assets/leads.gif">';
   }
 else{
 	$error = $code;
   echo $code.' Lead Not Added';
+
   }
 
 }
